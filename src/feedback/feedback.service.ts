@@ -6,12 +6,12 @@ import {
   SelfIntroductionDocument,
 } from "./schemas/self-introduction.schema";
 import { Feedback, FeedbackDocument } from "./schemas/feedback.schema";
-import { OpenAI } from "openai";
 import { ConfigService } from "@nestjs/config";
+import { GoogleGenAI, Type } from "@google/genai";
 
 @Injectable()
 export class FeedbackService {
-  private openai: OpenAI;
+  private gemini: GoogleGenAI;
 
   constructor(
     @InjectModel(SelfIntroduction.name)
@@ -20,8 +20,8 @@ export class FeedbackService {
     private feedbackModel: Model<FeedbackDocument>,
     private configService: ConfigService
   ) {
-    this.openai = new OpenAI({
-      apiKey: this.configService.get<string>("OPENAI_API_KEY"),
+    this.gemini = new GoogleGenAI({
+      apiKey: this.configService.get<string>("GEMINI_API_KEY"),
     });
   }
 
@@ -65,30 +65,43 @@ export class FeedbackService {
     content: string
   ): Promise<{ approved: boolean; feedback: string }> {
     try {
-      const response = await this.openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a helpful assistant that evaluates feedback on self-introduction letters. Respond in JSON format with two fields: 'approved' (boolean) and 'reason' (string). Approve the feedback unless it's completely irrelevant, too short (less than 10 characters), or contains inappropriate content. If approved is true, reason should be empty. If approved is false, provide a brief reason.",
+      const response = await this.gemini.models.generateContent({
+        model: "gemini-2.0-flash-lite",
+        contents: `다음 피드백을 평가하세요: ${content}`,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              approved: {
+                type: Type.BOOLEAN,
+                description:
+                  "피드백이 관련성이 있고, 너무 짧지 않고 (최소 10자 이상), 부적절한 내용이 포함되어 있지 않으면 True. 그렇지 않으면 False.",
+                nullable: false,
+              },
+              reason: {
+                type: Type.STRING,
+                description:
+                  "피드백을 승인하지 않은 간략한 이유. approved가 true이면 빈 문자열이어야 합니다.",
+                nullable: true,
+              },
+            },
+            required: ["approved"],
           },
-          {
-            role: "user",
-            content: `Evaluate this feedback: ${content}`,
-          },
-        ],
-        response_format: { type: "json_object" },
+        },
       });
 
-      const result = JSON.parse(response.choices[0].message.content);
+      const result = JSON.parse(response.text);
+
       return {
         approved: result.approved,
-        feedback: result.approved ? "피드백이 유용합니다." : result.reason,
+        feedback: result.approved
+          ? "피드백이 유용합니다."
+          : result.reason || "AI 평가 실패", // reason이 없을 경우를 대비
       };
     } catch (error) {
-      console.error("AI evaluation error:", error);
-      return { approved: false, feedback: "AI evaluation failed" };
+      console.error("AI 평가 오류:", error);
+      return { approved: false, feedback: "AI 평가 실패" };
     }
   }
 
