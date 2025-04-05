@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
 export type FeedbackDocument = Feedback & Document;
 
@@ -9,13 +9,13 @@ export class Feedback {
   content: string;
 
   @Prop({ required: true })
-  selectedText: string;
+  selections: number[];
 
   @Prop({ required: true })
   walletAddress: string;
 
-  @Prop({ required: true, default: 'pending' })
-  status: 'pending' | 'approved' | 'rejected';
+  @Prop({ required: true, default: "pending" })
+  status: "pending" | "approved" | "rejected";
 
   @Prop({ default: false })
   isAIApproved: boolean;
