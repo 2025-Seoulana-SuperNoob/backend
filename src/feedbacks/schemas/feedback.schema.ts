@@ -17,12 +17,6 @@ export class Feedback {
   @Prop({ required: true, default: "pending" })
   status: "pending" | "approved" | "rejected";
 
-  @Prop({ default: false })
-  isAIApproved: boolean;
-
-  @Prop()
-  aiFeedback: string;
-
   @Prop()
   rewardAmount: number;
 
