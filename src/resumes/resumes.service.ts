@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Resume, ResumeDocument } from './schemas/resume.schema';
-import { PaginatedResult } from './interfaces/paginated-result.interface';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { Resume, ResumeDocument } from "./schemas/resume.schema";
+import { PaginatedResult } from "./interfaces/paginated-result.interface";
 
 @Injectable()
 export class ResumesService {
@@ -17,7 +17,7 @@ export class ResumesService {
     year: number,
     experience: string,
     position: string,
-    questions: { question: string; answer: string }[],
+    questions: { question: string; answer: string }[]
   ) {
     const resume = new this.resumeModel({
       walletAddress,
@@ -32,16 +32,19 @@ export class ResumesService {
     return resume.save();
   }
 
-  async findAll(page: number = 1, limit: number = 10): Promise<PaginatedResult<Resume>> {
+  async findAll(
+    page: number = 1,
+    limit: number = 10
+  ): Promise<PaginatedResult<Resume>> {
     const skip = (page - 1) * limit;
     const [data, total] = await Promise.all([
       this.resumeModel
-        .find()
+        .find({ remainFeedbackCount: { $gt: 0 } })
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .exec(),
-      this.resumeModel.countDocuments(),
+      this.resumeModel.countDocuments({ remainFeedbackCount: { $gt: 0 } }),
     ]);
 
     return {
@@ -56,7 +59,7 @@ export class ResumesService {
   async findAllByWalletAddress(
     walletAddress: string,
     page: number = 1,
-    limit: number = 10,
+    limit: number = 10
   ): Promise<PaginatedResult<Resume>> {
     const skip = (page - 1) * limit;
 
