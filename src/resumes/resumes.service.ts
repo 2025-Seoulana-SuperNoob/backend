@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Resume, ResumeDocument } from './schemas/resume.schema';
+import { Feedback } from './schemas/feedback.schema';
 import { PaginatedResult } from './interfaces/paginated-result.interface';
 
 @Injectable()
 export class ResumesService {
   constructor(
     @InjectModel(Resume.name) private resumeModel: Model<ResumeDocument>,
+    @InjectModel(Feedback.name) private feedbackModel: Model<Feedback>,
   ) {}
 
   async create(
@@ -81,5 +83,22 @@ export class ResumesService {
 
   async findOne(id: string) {
     return this.resumeModel.findById(id);
+  }
+
+  async findFeedbacks(resumeId: string) {
+    return this.feedbackModel
+      .find({ resumeId })
+      .sort({ createdAt: -1 })
+      .exec();
+  }
+
+  async createFeedback(resumeId: string, content: string, selectedText: string, walletAddress: string) {
+    const newFeedback = new this.feedbackModel({
+      resumeId,
+      content,
+      selectedText,
+      walletAddress,
+    });
+    return newFeedback.save();
   }
 }
