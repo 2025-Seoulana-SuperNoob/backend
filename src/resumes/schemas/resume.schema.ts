@@ -3,7 +3,7 @@ import { Document } from "mongoose";
 
 export type ResumeDocument = Resume & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Resume {
   @Prop({ required: true })
   walletAddress: string;
@@ -29,8 +29,17 @@ export class Resume {
     answer: string;
   }[];
 
-  @Prop({ required: true, default: 3 })
+  @Prop({ required: true, default: 0 })
   remainFeedbackCount: number;
+
+  @Prop({ required: true, default: 0 })
+  depositAmount: number;
+
+  @Prop()
+  depositTransaction: string;
+
+  @Prop({ default: false })
+  isDeposited: boolean;
 
   @Prop({ default: Date.now })
   createdAt: Date;

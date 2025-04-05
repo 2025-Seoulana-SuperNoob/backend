@@ -16,6 +16,8 @@ export class ResumesController {
     @Body('experience') experience: string,
     @Body('position') position: string,
     @Body('questions') questions: { question: string; answer: string }[],
+    @Body("depositAmount") depositAmount: number,
+    @Body("depositTransaction") depositTransaction: string
   ) {
     return this.resumesService.create(
       walletAddress,
@@ -25,6 +27,8 @@ export class ResumesController {
       experience,
       position,
       questions,
+      depositAmount,
+      depositTransaction
     );
   }
 
