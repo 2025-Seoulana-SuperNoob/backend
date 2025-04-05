@@ -36,7 +36,8 @@ export class FeedbacksService {
       content,
       walletAddress,
     });
-    var result = await this.evaluateFeedbackWithAI(content);
+    const result = await this.evaluateFeedbackWithAI(content);
+    console.log(result.feedback);
     if (result.approved) {
       resume.remainFeedbackCount--;
       await resume.save();
@@ -52,7 +53,7 @@ export class FeedbacksService {
     try {
       const response = await this.gemini.models.generateContent({
         model: "gemini-2.0-flash-lite",
-        contents: `다음 피드백을 평가하세요: ${content}`,
+        contents: `다음의 피드백을 평가하세요: ${content}`,
         config: {
           responseMimeType: "application/json",
           responseSchema: {
@@ -61,7 +62,7 @@ export class FeedbacksService {
               approved: {
                 type: Type.BOOLEAN,
                 description:
-                  "길이가 최소 5자 이상이고 자기소개서 피드백과 관련된 내용이면 True. 그렇지 않으면 False.",
+                  "전체 내용의 길이가 5자 이상이고 자기소개서 피드백과 관련된 내용이면 True, 그렇지 않으면 False 반환.",
                 nullable: false,
               },
               reason: {

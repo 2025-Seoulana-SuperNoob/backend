@@ -12,9 +12,6 @@ export class Feedback {
   content: string;
 
   @Prop({ required: true })
-  index: number;
-
-  @Prop({ required: true })
   walletAddress: string;
 
   @Prop()
