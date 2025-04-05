@@ -32,7 +32,12 @@ export class FeedbacksService {
       walletAddress,
       status: "pending",
     });
-    return feedback.save();
+    var result = await this.evaluateFeedbackWithAI(content);
+    if (result.approved) {
+      return feedback.save();
+    } else {
+      throw new Error("답변 검사 불합격");
+    }
   }
 
   private async evaluateFeedbackWithAI(
