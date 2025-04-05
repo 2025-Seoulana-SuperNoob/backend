@@ -22,13 +22,13 @@ export class FeedbacksService {
   async createFeedback(
     resumeId: string,
     content: string,
-    selections: number[],
+    index: number,
     walletAddress: string
   ): Promise<Feedback> {
     const feedback = new this.feedbackModel({
       resumeId,
       content,
-      selections,
+      index,
       walletAddress,
       status: "pending",
     });

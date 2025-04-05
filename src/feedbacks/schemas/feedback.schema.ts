@@ -6,10 +6,13 @@ export type FeedbackDocument = Feedback & Document;
 @Schema({ timestamps: true })
 export class Feedback {
   @Prop({ required: true })
+  resumeId: string;
+
+  @Prop({ required: true })
   content: string;
 
   @Prop({ required: true })
-  selections: number[];
+  index: number;
 
   @Prop({ required: true })
   walletAddress: string;
