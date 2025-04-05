@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
 export type ResumeDocument = Resume & Document;
 
@@ -17,7 +17,7 @@ export class Resume {
   @Prop({ required: true })
   year: number;
 
-  @Prop({ required: true, enum: ['newcomer', 'experienced'] })
+  @Prop({ required: true, enum: ["신입", "경력"] })
   experience: string;
 
   @Prop({ required: true })
