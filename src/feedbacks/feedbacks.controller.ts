@@ -15,13 +15,11 @@ export class FeedbacksController {
   async createFeedback(
     @Param("id") id: string,
     @Body("content") content: string,
-    @Body("index") index: number,
     @Body("walletAddress") walletAddress: string
   ): Promise<Feedback> {
     return this.feedbacksService.createFeedback(
       id,
       content,
-      index,
       walletAddress
     );
   }

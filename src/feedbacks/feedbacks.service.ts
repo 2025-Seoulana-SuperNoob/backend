@@ -25,7 +25,6 @@ export class FeedbacksService {
   async createFeedback(
     resumeId: string,
     content: string,
-    index: number,
     walletAddress: string
   ): Promise<Feedback> {
     const resume = await this.resumeModel.findById(resumeId);
@@ -35,7 +34,6 @@ export class FeedbacksService {
     const feedback = new this.feedbackModel({
       resumeId,
       content,
-      index,
       walletAddress,
     });
     var result = await this.evaluateFeedbackWithAI(content);
