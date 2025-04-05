@@ -1,5 +1,7 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Query } from '@nestjs/common';
 import { ResumesService } from './resumes.service';
+import { PaginatedResult } from './interfaces/paginated-result.interface';
+import { Resume } from './schemas/resume.schema';
 
 @Controller('resumes')
 export class ResumesController {
@@ -26,9 +28,15 @@ export class ResumesController {
     );
   }
 
-  @Get('wallet/:walletAddress')
-  async findAllByWalletAddress(@Param('walletAddress') walletAddress: string) {
-    return this.resumesService.findAllByWalletAddress(walletAddress);
+  @Get()
+  async findAll(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+  ): Promise<PaginatedResult<Resume>> {
+    return this.resumesService.findAll(
+      parseInt(page),
+      parseInt(limit),
+    );
   }
 
   @Get(':id')
