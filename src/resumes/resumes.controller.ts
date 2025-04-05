@@ -2,7 +2,6 @@ import { Controller, Post, Body, Get, Param, Query } from '@nestjs/common';
 import { ResumesService } from './resumes.service';
 import { PaginatedResult } from './interfaces/paginated-result.interface';
 import { Resume } from './schemas/resume.schema';
-import { Feedback } from './schemas/feedback.schema';
 
 @Controller('resumes')
 export class ResumesController {
@@ -43,20 +42,5 @@ export class ResumesController {
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.resumesService.findOne(id);
-  }
-
-  @Get(':id/feedback')
-  async findFeedbacks(@Param('id') id: string): Promise<Feedback[]> {
-    return this.resumesService.findFeedbacks(id);
-  }
-
-  @Post(':id/feedback')
-  async createFeedback(
-    @Param('id') id: string,
-    @Body('content') content: string,
-    @Body('selectedText') selectedText: string,
-    @Body('walletAddress') walletAddress: string,
-  ): Promise<Feedback> {
-    return this.resumesService.createFeedback(id, content, selectedText, walletAddress);
   }
 }
