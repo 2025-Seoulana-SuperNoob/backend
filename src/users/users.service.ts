@@ -26,4 +26,16 @@ export class UsersService {
   async findByWalletAddress(walletAddress: string) {
     return this.userModel.findOne({ walletAddress });
   }
+
+  async getUserInfo(walletAddress: string) {
+    const user = await this.userModel.findOne({ walletAddress });
+    if (!user) {
+      return null;
+    }
+
+    return {
+      walletAddress: user.walletAddress,
+      nickname: user.nickname,
+    };
+  }
 }
