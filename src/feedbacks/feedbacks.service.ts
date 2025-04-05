@@ -4,6 +4,7 @@ import { Model } from "mongoose";
 import { Feedback, FeedbackDocument } from "./schemas/feedback.schema";
 import { ConfigService } from "@nestjs/config";
 import { GoogleGenAI, Type } from "@google/genai";
+import { ResumeDocument } from "src/resumes/schemas/resume.schema";
 
 @Injectable()
 export class FeedbacksService {
@@ -12,7 +13,8 @@ export class FeedbacksService {
   constructor(
     @InjectModel(Feedback.name)
     private feedbackModel: Model<FeedbackDocument>,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private resumeModel: Model<ResumeDocument>
   ) {
     this.gemini = new GoogleGenAI({
       apiKey: this.configService.get<string>("GEMINI_API_KEY"),
@@ -25,6 +27,10 @@ export class FeedbacksService {
     index: number,
     walletAddress: string
   ): Promise<Feedback> {
+    const resume = await this.resumeModel.findById(resumeId);
+    if (resume.remainFeedbackCount <= 0) {
+      throw new Error("피드백 개수 초과");
+    }
     const feedback = new this.feedbackModel({
       resumeId,
       content,
@@ -33,6 +39,8 @@ export class FeedbacksService {
     });
     var result = await this.evaluateFeedbackWithAI(content);
     if (result.approved) {
+      resume.remainFeedbackCount--;
+      await resume.save();
       return feedback.save();
     } else {
       throw new Error("답변 검사 불합격");

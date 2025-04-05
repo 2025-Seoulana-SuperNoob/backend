@@ -29,6 +29,9 @@ export class Resume {
     answer: string;
   }[];
 
+  @Prop({ required: true, default: 3 })
+  remainFeedbackCount: number;
+
   @Prop({ default: Date.now })
   createdAt: Date;
 
