@@ -6,13 +6,13 @@ export type FeedbackDocument = Feedback & Document;
 @Schema({ timestamps: true })
 export class Feedback {
   @Prop({ required: true })
-  selfIntroductionId: string;
-
-  @Prop({ required: true })
-  userId: string;
-
-  @Prop({ required: true })
   content: string;
+
+  @Prop({ required: true })
+  selectedText: string;
+
+  @Prop({ required: true })
+  walletAddress: string;
 
   @Prop({ required: true, default: 'pending' })
   status: 'pending' | 'approved' | 'rejected';
@@ -30,4 +30,4 @@ export class Feedback {
   rewardTransaction: string;
 }
 
-export const FeedbackSchema = SchemaFactory.createForClass(Feedback); 
+export const FeedbackSchema = SchemaFactory.createForClass(Feedback);

@@ -10,7 +10,7 @@ import { ConfigService } from "@nestjs/config";
 import { GoogleGenAI, Type } from "@google/genai";
 
 @Injectable()
-export class FeedbackService {
+export class FeedbacksService {
   private gemini: GoogleGenAI;
 
   constructor(
@@ -42,22 +42,18 @@ export class FeedbackService {
   }
 
   async createFeedback(
-    selfIntroductionId: string,
-    userId: string,
-    content: string
+    resumeId: string,
+    content: string,
+    selectedText: string,
+    walletAddress: string
   ): Promise<Feedback> {
     const feedback = new this.feedbackModel({
-      selfIntroductionId,
-      userId,
+      resumeId,
       content,
-      status: "pending",
+      selectedText,
+      walletAddress,
+      status: 'pending',
     });
-
-    // AI 평가 수행
-    const aiEvaluation = await this.evaluateFeedbackWithAI(content);
-    feedback.isAIApproved = aiEvaluation.approved;
-    feedback.aiFeedback = aiEvaluation.feedback;
-
     return feedback.save();
   }
 
@@ -127,5 +123,9 @@ export class FeedbackService {
     selfIntroductionId: string
   ): Promise<Feedback[]> {
     return this.feedbackModel.find({ selfIntroductionId });
+  }
+
+  async findFeedbacks(resumeId: string): Promise<Feedback[]> {
+    return this.feedbackModel.find({ resumeId }).sort({ createdAt: -1 }).exec();
   }
 }

@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
-import { FeedbackModule } from "./feedback/feedback.module";
+import { FeedbacksModule } from "./feedbacks/feedbacks.module";
 import { SolanaModule } from "./solana/solana.module";
 import { UsersModule } from './users/users.module';
 import { ResumesModule } from './resumes/resumes.module';
@@ -18,7 +18,7 @@ import { ResumesModule } from './resumes/resumes.module';
       }),
       inject: [ConfigService],
     }),
-    FeedbackModule,
+    FeedbacksModule,
     SolanaModule,
     UsersModule,
     ResumesModule,
