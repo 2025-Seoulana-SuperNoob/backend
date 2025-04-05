@@ -4,7 +4,7 @@ import { Model } from "mongoose";
 import { Feedback, FeedbackDocument } from "./schemas/feedback.schema";
 import { ConfigService } from "@nestjs/config";
 import { GoogleGenAI, Type } from "@google/genai";
-import { ResumeDocument } from "src/resumes/schemas/resume.schema";
+import { Resume, ResumeDocument } from "src/resumes/schemas/resume.schema";
 
 @Injectable()
 export class FeedbacksService {
@@ -14,6 +14,7 @@ export class FeedbacksService {
     @InjectModel(Feedback.name)
     private feedbackModel: Model<FeedbackDocument>,
     private configService: ConfigService,
+    @InjectModel(Resume.name)
     private resumeModel: Model<ResumeDocument>
   ) {
     this.gemini = new GoogleGenAI({
