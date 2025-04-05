@@ -5,6 +5,7 @@ import { Feedback, FeedbackDocument } from "./schemas/feedback.schema";
 import { ConfigService } from "@nestjs/config";
 import { GoogleGenAI, Type } from "@google/genai";
 import { Resume, ResumeDocument } from "src/resumes/schemas/resume.schema";
+import { SolanaService } from "../solana/solana.service";
 
 @Injectable()
 export class FeedbacksService {
@@ -15,7 +16,8 @@ export class FeedbacksService {
     private feedbackModel: Model<FeedbackDocument>,
     private configService: ConfigService,
     @InjectModel(Resume.name)
-    private resumeModel: Model<ResumeDocument>
+    private resumeModel: Model<ResumeDocument>,
+    private solanaService: SolanaService
   ) {
     this.gemini = new GoogleGenAI({
       apiKey: this.configService.get<string>("GEMINI_API_KEY"),
@@ -27,23 +29,51 @@ export class FeedbacksService {
     content: string,
     walletAddress: string
   ): Promise<Feedback> {
-    const resume = await this.resumeModel.findById(resumeId);
-    if (resume.remainFeedbackCount <= 0) {
-      throw new Error("피드백 개수 초과");
-    }
-    const feedback = new this.feedbackModel({
-      resumeId,
-      content,
-      walletAddress,
-    });
-    const result = await this.evaluateFeedbackWithAI(content);
-    console.log(result.feedback);
-    if (result.approved) {
-      resume.remainFeedbackCount--;
-      await resume.save();
-      return feedback.save();
-    } else {
-      throw new Error("답변 검사 불합격");
+    try {
+      const resume = await this.resumeModel.findById(resumeId);
+      if (resume.remainFeedbackCount <= 0) {
+        throw new Error("피드백 개수 초과");
+      }
+
+      console.log(walletAddress)
+
+      const feedback = new this.feedbackModel({
+        resumeId,
+        content,
+        walletAddress,
+      });
+
+      const result = await this.evaluateFeedbackWithAI(content);
+      console.log(result.feedback);
+
+      if (result.approved) {
+        resume.remainFeedbackCount--;
+        await resume.save();
+
+        try {
+          // 보상 전송 시도
+          const signature = await this.solanaService.sendReward(
+            walletAddress,
+            0.000001 // 0.000001 SOL
+          );
+
+          // 보상 전송 성공 시 피드백 저장
+          feedback.rewardAmount = 0.000001;
+          feedback.rewardTransaction = signature;
+        } catch (error) {
+          console.error('Failed to send reward:', error);
+          // 보상 전송 실패 시에도 피드백은 저장
+          feedback.rewardAmount = 0;
+          feedback.rewardTransaction = 'failed';
+        }
+
+        return feedback.save();
+      } else {
+        throw new Error("답변 검사 불합격");
+      }
+    } catch (error) {
+      console.error('Error in createFeedback:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to create feedback');
     }
   }
 

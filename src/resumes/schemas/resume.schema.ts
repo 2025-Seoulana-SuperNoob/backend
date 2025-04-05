@@ -29,23 +29,8 @@ export class Resume {
     answer: string;
   }[];
 
-  @Prop({ required: true, default: 0 })
+  @Prop({ required: true, default: 3 })
   remainFeedbackCount: number;
-
-  @Prop({ required: true, default: 0 })
-  depositAmount: number;
-
-  @Prop()
-  depositTransaction: string;
-
-  @Prop({ default: false })
-  isDeposited: boolean;
-
-  @Prop({ default: Date.now })
-  createdAt: Date;
-
-  @Prop({ default: Date.now })
-  updatedAt: Date;
 }
 
 export const ResumeSchema = SchemaFactory.createForClass(Resume);

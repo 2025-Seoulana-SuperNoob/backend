@@ -22,29 +22,8 @@ export class ResumesService {
     year: number,
     experience: string,
     position: string,
-    questions: { question: string; answer: string }[],
-	depositAmount: number,
-	depositTransaction: string
+    questions: { question: string; answer: string }[]
   ) {
-	const tx = await this.connection.getTransaction(depositTransaction);
-    if (!tx) {
-      throw new Error("유효하지 않은 트랜잭션입니다.");
-    }
-
-    // 예치금 확인
-    const expectedLamports = depositAmount * 1e9; // SOL to lamports
-    const actualLamports = tx.meta?.postBalances[1] - tx.meta?.preBalances[1];
-
-    if (actualLamports !== expectedLamports) {
-      throw new Error("예치금 금액이 일치하지 않습니다.");
-    }
-
-    // 수신자 주소 확인
-    const programId = new PublicKey("YOUR_PROGRAM_ID");
-    if (!tx.transaction.message.accountKeys.some(key => key.equals(programId))) {
-      throw new Error("잘못된 수신자 주소입니다.");
-    }
-
     const resume = new this.resumeModel({
 		walletAddress,
 		title,
@@ -53,9 +32,6 @@ export class ResumesService {
 		experience,
 		position,
 		questions,
-      depositAmount,
-      depositTransaction,
-      isDeposited: true,
     });
 
     return resume.save();
