@@ -55,7 +55,7 @@ export class FeedbacksService {
               approved: {
                 type: Type.BOOLEAN,
                 description:
-                  "피드백이 관련성이 있고, 너무 짧지 않고 (최소 10자 이상), 부적절한 내용이 포함되어 있지 않으면 True. 그렇지 않으면 False.",
+                  "길이가 최소 5자 이상이고 자기소개서 피드백과 관련된 내용이면 True. 그렇지 않으면 False.",
                 nullable: false,
               },
               reason: {
