@@ -30,7 +30,6 @@ export class FeedbacksService {
       content,
       index,
       walletAddress,
-      status: "pending",
     });
     var result = await this.evaluateFeedbackWithAI(content);
     if (result.approved) {
@@ -82,16 +81,6 @@ export class FeedbacksService {
       console.error("AI 평가 오류:", error);
       return { approved: false, feedback: "AI 평가 실패" };
     }
-  }
-
-  async approveFeedback(feedbackId: string): Promise<Feedback> {
-    const feedback = await this.feedbackModel.findById(feedbackId);
-    if (!feedback) {
-      throw new Error("Feedback not found");
-    }
-
-    feedback.status = "approved";
-    return feedback.save();
   }
 
   async getFeedback(id: string): Promise<Feedback> {

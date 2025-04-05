@@ -17,9 +17,6 @@ export class Feedback {
   @Prop({ required: true })
   walletAddress: string;
 
-  @Prop({ required: true, default: "pending" })
-  status: "pending" | "approved" | "rejected";
-
   @Prop()
   rewardAmount: number;
 
