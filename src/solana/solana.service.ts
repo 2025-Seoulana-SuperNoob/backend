@@ -18,7 +18,10 @@ export class SolanaService {
     amount: number,
   ): Promise<{ escrowAccount: string; transaction: string }> {
     const fromPubkey = new PublicKey(fromPublicKey);
-    const escrowAccount = new PublicKey(); // 실제 구현에서는 PDA를 생성해야 합니다
+    const [escrowAccount] = PublicKey.findProgramAddressSync(
+      [Buffer.from('escrow'), fromPubkey.toBuffer()],
+      new PublicKey('YourProgramId') // Replace with your actual program ID
+    );
 
     const transaction = new Transaction().add(
       SystemProgram.transfer({
@@ -60,4 +63,4 @@ export class SolanaService {
     const balance = await this.connection.getBalance(pubkey);
     return balance / LAMPORTS_PER_SOL;
   }
-} 
+}
