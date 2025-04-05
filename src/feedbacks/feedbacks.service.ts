@@ -1,10 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import {
-  SelfIntroduction,
-  SelfIntroductionDocument,
-} from "./schemas/self-introduction.schema";
 import { Feedback, FeedbackDocument } from "./schemas/feedback.schema";
 import { ConfigService } from "@nestjs/config";
 import { GoogleGenAI, Type } from "@google/genai";
@@ -14,8 +10,6 @@ export class FeedbacksService {
   private gemini: GoogleGenAI;
 
   constructor(
-    @InjectModel(SelfIntroduction.name)
-    private selfIntroductionModel: Model<SelfIntroductionDocument>,
     @InjectModel(Feedback.name)
     private feedbackModel: Model<FeedbackDocument>,
     private configService: ConfigService
@@ -23,22 +17,6 @@ export class FeedbacksService {
     this.gemini = new GoogleGenAI({
       apiKey: this.configService.get<string>("GEMINI_API_KEY"),
     });
-  }
-
-  async createSelfIntroduction(
-    userId: string,
-    content: string,
-    targetFeedbackCount: number,
-    depositAmount: number
-  ): Promise<SelfIntroduction> {
-    const selfIntroduction = new this.selfIntroductionModel({
-      userId,
-      content,
-      targetFeedbackCount,
-      depositAmount,
-      status: "pending",
-    });
-    return selfIntroduction.save();
   }
 
   async createFeedback(
@@ -109,10 +87,6 @@ export class FeedbacksService {
 
     feedback.status = "approved";
     return feedback.save();
-  }
-
-  async getSelfIntroduction(id: string): Promise<SelfIntroduction> {
-    return this.selfIntroductionModel.findById(id);
   }
 
   async getFeedback(id: string): Promise<Feedback> {
